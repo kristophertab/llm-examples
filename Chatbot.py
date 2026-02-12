@@ -1,29 +1,16 @@
-from openai import OpenAI
 import streamlit as st
+from langchain_ollama import ChatOllama
+from langchain_core.messages import HumanMessage
 
-with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
-    "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-    "[View the source code](https://github.com/streamlit/llm-examples/blob/main/Chatbot.py)"
-    "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
+st.title("🦜🔗 Langchain Quickstart App")
 
-st.title("💬 Chatbot")
-st.caption("🚀 A Streamlit chatbot powered by OpenAI")
-if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+def generate_response(input_text):
+    llm = ChatOllama(model="gemma2:2b", temperature=0)
+    messages = [HumanMessage(content=input_text)]
+    st.info(llm.invoke(messages).content)
 
-for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
-
-if prompt := st.chat_input():
-    if not openai_api_key:
-        st.info("Please add your OpenAI API key to continue.")
-        st.stop()
-
-    client = OpenAI(api_key=openai_api_key)
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
-    response = client.chat.completions.create(model="gpt-3.5-turbo", messages=st.session_state.messages)
-    msg = response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": msg})
-    st.chat_message("assistant").write(msg)
+with st.form("my_form"):
+    text = st.text_area("Enter text:", "What are 3 key advice for learning how to code?")
+    submitted = st.form_submit_button("Submit")
+    if submitted:
+        generate_response(text)
