@@ -4,8 +4,11 @@ from langchain_core.messages import HumanMessage
 
 st.title("🦜🔗 Langchain Quickstart App")
 
+with st.sidebar:
+    model_name = st.selectbox("Model", ("llama3.2:3b", "qwen3:1.7b", "gemma3:4b", "gemma2:2b", "mistral:latest"))
+
 def generate_response(input_text):
-    llm = ChatOllama(model="gemma2:2b", temperature=0)
+    llm = ChatOllama(model=model_name, temperature=0)
     messages = [HumanMessage(content=input_text)]
     response_placeholder = st.empty()
     full_response = ""
