@@ -3,12 +3,15 @@ import base64
 from io import BytesIO
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
+import ollama
 
 st.title("Chatbot")
 st.caption("A Streamlit chatbot powered by local Ollama")
 
 with st.sidebar:
-    model_name = st.selectbox("Model", ("llama3.2:3b", "qwen3:1.7b", "gemma3:4b", "gemma2:2b", "mistral:latest"))
+    ollama_models = ollama.list()
+    ollama_models_names = [model['model'] for model in ollama_models['models']]
+    model_name = st.selectbox("Model", (ollama_models_names))
 
 def convert_to_base64(file):
     return base64.b64encode(file.getvalue()).decode("utf-8")
